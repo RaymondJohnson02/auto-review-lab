@@ -4,3 +4,9 @@ GET {{AutoReviewLab_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{AutoReviewLab_HostAddress}}/products/
+Accept: application/json
+
+###
+
