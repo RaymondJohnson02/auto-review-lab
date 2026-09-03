@@ -1,0 +1,6 @@
+@AutoReviewLab_HostAddress = http://localhost:5219
+
+GET {{AutoReviewLab_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
