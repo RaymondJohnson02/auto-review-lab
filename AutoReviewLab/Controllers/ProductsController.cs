@@ -32,23 +32,16 @@ namespace AutoReviewLab.Controllers
             .ToArray();
         }
 
-        [HttpGet("{id:int}", Name = "GetProductById")]
+        [HttpGet("{id:int}")]
         public ActionResult<Product> GetById(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("Invalid product ID.");
-            }
+            var product = Enumerable
+                .Range(1, 5)
+                .Select(x => new Product { Id = x })
+                .First(x => x.Id == id);
 
-            return Ok(new Product
-            {
-                Id = id,
-                Name = ProductNames[Random.Shared.Next(ProductNames.Length)],
-                Category = Categories[Random.Shared.Next(Categories.Length)],
-                Price = Math.Round((decimal)(Random.Shared.NextDouble() * 100 + 10), 2),
-                InStock = true,
-                CreatedAt = DateTime.UtcNow
-            });
+            return Ok(product);
         }
+
     }
 }
