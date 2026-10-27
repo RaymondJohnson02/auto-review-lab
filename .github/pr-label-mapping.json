@@ -1,0 +1,7 @@
+{
+  "develop": "development",
+  "staging": "staging",
+  "main": "production",
+  "release": "release",
+  "hotfix": "urgent"
+}
