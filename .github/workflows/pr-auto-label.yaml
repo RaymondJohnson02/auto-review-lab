@@ -1,0 +1,39 @@
+
+name: PR Auto Label
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  label-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Apply label based on destination branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          REPO: ${{ github.repository }}
+        run: |
+          MAPPING=$(cat .github/pr-label-mapping.json)
+
+          LABEL=$(echo "$MAPPING" | jq -r \
+            --arg branch "$BASE_BRANCH" '.[$branch] // empty')
+
+          if [ -z "$LABEL" ]; then
+            echo "No label mapping for branch: $BASE_BRANCH"
+            exit 0
+          fi
+
+          gh api \
+            --method POST \
+            "repos/$REPO/issues/$PR_NUMBER/labels" \
+            -f "labels[]=$LABEL"
+
+          echo "Applied label '$LABEL' to PR #$PR_NUMBER"
