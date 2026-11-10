@@ -3,7 +3,7 @@ name: PR Auto Label
 
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened]
 
 permissions:
   pull-requests: write
@@ -33,6 +33,17 @@ jobs:
             echo "No label mapping for branch: $BASE_BRANCH"
             exit 0
           fi
+
+          # Clean up any outdated branch labels if the base branch was changed
+          ALL_MAPPED_LABELS=$(echo "$MAPPING" | jq -r 'to_entries[].value')
+          CURRENT_LABELS=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json labels --jq '.labels[].name')
+
+          for l in $CURRENT_LABELS; do
+            if echo "$ALL_MAPPED_LABELS" | grep -Fxq "$l" && [ "$l" != "$LABEL" ]; then
+              echo "Removing outdated branch label '$l'"
+              gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "$l" || true
+            fi
+          done
 
           gh api \
             --method POST \
